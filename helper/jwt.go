@@ -1,49 +1,50 @@
 package helper
 
 import (
-	"os"
+	"errors"
+	"fmt"
 	"strings"
-
-	"Fp-TokoBelanja/domain"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-var secretKey = os.Getenv("JWT_SECRET_KEY")
+var myKey = "hacktiv"
 
-func GenerateToken(id int64, role string) string {
+func GenerateToken(id uint, email string) string {
 	claims := jwt.MapClaims{
-		"id":   id,
-		"role": role,
+		"id":    id,
+		"email": email,
 	}
 
 	parseToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, _ := parseToken.SignedString([]byte(secretKey))
+
+	signedToken, _ := parseToken.SignedString([]byte(myKey))
 
 	return signedToken
 }
 
 func VerifyToken(c *gin.Context) (interface{}, error) {
+	errResponse := errors.New("sign in to proceed")
 	headerToken := c.Request.Header.Get("Authorization")
 	bearer := strings.HasPrefix(headerToken, "Bearer")
 
 	if !bearer {
-		return nil, domain.ErrUnauthorized
+		return nil, errResponse
 	}
-	if len(headerToken) <= 6 {
-		return nil, domain.ErrUnauthorized
-	}
-	stringToken := strings.Split(headerToken, " ")[1]
 
+	stringToken := strings.Split(headerToken, " ")[1]
 	token, _ := jwt.Parse(stringToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, domain.ErrUnauthorized
+			return nil, errResponse
 		}
-		return []byte(secretKey), nil
+		return []byte(myKey), nil
 	})
+
 	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
-		return nil, domain.ErrUnauthorized
+		return nil, errResponse
 	}
+	fmt.Println("Token tervarify")
 	return token.Claims.(jwt.MapClaims), nil
+
 }
