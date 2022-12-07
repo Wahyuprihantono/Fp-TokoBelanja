@@ -24,6 +24,10 @@ func main() {
 	categoryService := service.NewCategoryService(categoryRepository)
 	categoryController := controller.NewCategoryController(categoryService)
 
+	productRepository := repository.NewProductRepository(db)
+	productService := service.NewProductService(productRepository)
+	productController := controller.NewProductController(productService)
+
 	// Users
 	router.POST("/users/register", userController.RegisterUser)
 	router.POST("/users/login", userController.LoginUser)
@@ -36,6 +40,12 @@ func main() {
 	router.GET("/categories", middleware.AuthMiddleware, categoryController.GetAllCategories)
 	router.PATCH("/categories/:id", middleware.AuthMiddleware, categoryController.PatchCategory)
 	router.DELETE("/categories/:id", middleware.AuthMiddleware, categoryController.DeleteCategory)
+
+	// Products
+	router.POST("/products", middleware.AuthMiddleware, productController.CreateProduct)
+	router.GET("/products", middleware.AuthMiddleware, productController.GetAllProducts)
+	router.PUT("/products/:id", middleware.AuthMiddleware, productController.UpdateProduct)
+	router.DELETE("/products/:id", middleware.AuthMiddleware, productController.DeleteProduct)
 
 	port := os.Getenv("PORT")
 	if port == "" {
