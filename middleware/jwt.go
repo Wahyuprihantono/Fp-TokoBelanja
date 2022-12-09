@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	SECRET_KEY = []byte("RAHASIA")
+	SECRET_KEY = []byte("hactiv8")
 )
 
 func GenerateToken(userID int, role string) (string, error) {
