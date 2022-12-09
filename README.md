@@ -7,3 +7,4 @@ Pada Final Project keempat ini kami membuat aplikasi CRUD bernama Toko Belanja y
   3. Wahyu Prihantono []
   
   
+[Link Deploy](fp-tokobelanja-production.up.railway.app)
