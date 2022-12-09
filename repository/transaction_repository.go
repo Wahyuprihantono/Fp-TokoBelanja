@@ -8,7 +8,7 @@ import (
 
 type TransactionRepository interface {
 	Save(transaction entity.TransactionHistory) (entity.TransactionHistory, error)
-	FindById(Id int) (entity.TransactionHistory, error)
+	FindById(id int) (entity.TransactionHistory, error)
 	FindByUserID(id_user int) ([]entity.TransactionHistory, error)
 	FindAll() ([]entity.TransactionHistory, error)
 }

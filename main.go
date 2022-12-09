@@ -17,19 +17,18 @@ func main() {
 	db := config.GetDBConnection()
 
 	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
-	userController := controller.NewUserController(userService)
-
 	categoryRepository := repository.NewCategoryRepository(db)
-	categoryService := service.NewCategoryService(categoryRepository)
-	categoryController := controller.NewCategoryController(categoryService)
-
 	productRepository := repository.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
-	productController := controller.NewProductController(productService)
-
 	transactionRepository := repository.NewTransactionRepository(db)
+
+	userService := service.NewUserService(userRepository)
+	categoryService := service.NewCategoryService(categoryRepository, productRepository)
+	productService := service.NewProductService(productRepository, categoryRepository)
 	transactionService := service.NewTransactionService(transactionRepository, userRepository, productRepository, categoryRepository)
+
+	userController := controller.NewUserController(userService)
+	categoryController := controller.NewCategoryController(categoryService)
+	productController := controller.NewProductController(productService)
 	transactionController := controller.NewTransactionController(transactionService)
 
 	// Users
@@ -42,14 +41,14 @@ func main() {
 	// Categories
 	router.POST("/categories", middleware.AuthMiddleware, categoryController.CreateCategory)
 	router.GET("/categories", middleware.AuthMiddleware, categoryController.GetAllCategories)
-	router.PATCH("/categories/:id", middleware.AuthMiddleware, categoryController.PatchCategory)
-	router.DELETE("/categories/:id", middleware.AuthMiddleware, categoryController.DeleteCategory)
+	router.PATCH("/categories/:categoryId", middleware.AuthMiddleware, categoryController.PatchCategory)
+	router.DELETE("/categories/:categoryId", middleware.AuthMiddleware, categoryController.DeleteCategory)
 
 	// Products
 	router.POST("/products", middleware.AuthMiddleware, productController.CreateProduct)
 	router.GET("/products", middleware.AuthMiddleware, productController.GetAllProducts)
-	router.PUT("/products/:id", middleware.AuthMiddleware, productController.UpdateProduct)
-	router.DELETE("/products/:id", middleware.AuthMiddleware, productController.DeleteProduct)
+	router.PUT("/products/:productId", middleware.AuthMiddleware, productController.UpdateProduct)
+	router.DELETE("/products/:productId", middleware.AuthMiddleware, productController.DeleteProduct)
 
 	// TransactionHistories
 	router.POST("/transactions", middleware.AuthMiddleware, transactionController.CreateTransaction)
